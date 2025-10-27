@@ -1,9 +1,13 @@
 {
   "name": "server",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "dev": "nodemon --exec \"node --loader ts-node/esm\" src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,9 +24,12 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.9.1",
-    "ts-node-dev": "^2.0.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }

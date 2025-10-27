@@ -2,9 +2,9 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import studentRoutes from "./routes/students";
-import teacherRoutes from "./routes/teachers";
-import classRoutes from "./routes/classes";
+import studentRoutes from "./routes/students/index.js";
+import teacherRoutes from "./routes/teachers/index.js";
+import classRoutes from "./routes/classes/index.js";
 dotenv.config();
 mongoose.connect(process.env.MONGODB_URI || "", {
     // useNewUrlParser, useUnifiedTopology no longer needed in Mongoose 6+

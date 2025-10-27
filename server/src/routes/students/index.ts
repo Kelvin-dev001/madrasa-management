@@ -1,7 +1,9 @@
+import { Router } from "express";
+import { Student } from "../../models/Student.js";
 import { z } from "zod";
-import { authenticateJWT } from "../../middleware/auth";
+import { authenticateJWT } from "../../middleware/auth.js";
 
-
+const router = Router();
 
 const studentSchema = z.object({
   name: z.string().min(3),
@@ -26,20 +28,37 @@ const studentSchema = z.object({
   })).optional()
 });
 
-router.post("/", authenticateJWT, async (req, res) => { /* ... */ });
-router.get("/", authenticateJWT, async (req, res) => { /* ... */ });
-
-router.post("/", async (req, res) => {
+// Protected: Create a new student
+router.post("/", authenticateJWT, async (req, res) => {
   try {
     const parsed = studentSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: parsed.error.errors });
+      return res.status(400).json({ error: parsed.error.issues });
     }
     const student = new Student(parsed.data);
     await student.save();
     res.status(201).json(student);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    if (err instanceof Error) {
+      res.status(400).json({ error: (err as Error).message });
+    } else {
+      res.status(400).json({ error: "An unknown error occurred" });
+    }
   }
 });
 
+// Protected: Get all students
+router.get("/", authenticateJWT, async (req, res) => {
+  try {
+    const students = await Student.find();
+    res.json(students);
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(400).json({ error: "An unknown error occurred" });
+    }
+  }
+});
+
+export default router;

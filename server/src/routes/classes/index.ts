@@ -1,27 +1,63 @@
-import { Router } from "express";
-import { Class } from "../../models/Class.js";
+import { Router, Request, Response } from "express";
+import { Student } from "../../models/Student.js";
+import { z } from "zod";
 import { authenticateJWT } from "../../middleware/auth.js";
 
 const router = Router();
 
-// Protected: Create a class
-router.post("/", authenticateJWT, async (req, res) => {
+const studentSchema = z.object({
+  name: z.string().min(3),
+  rollId: z.string().min(4),
+  gender: z.enum(["Male", "Female"]),
+  status: z.enum(["Active", "Inactive", "Graduated"]).optional(),
+  registrationDate: z.string().optional(),
+  stream: z.string().optional(),
+  currentClass: z.string().optional(),
+  currentAcademicYear: z.string().optional(),
+  parents: z.array(z.object({
+    parent: z.string(),
+    relationship: z.enum(["Father", "Mother", "Guardian"]),
+    isPrimary: z.boolean().optional()
+  })).optional(),
+  classHistory: z.array(z.object({
+    academicYear: z.string(),
+    class: z.string(),
+    stream: z.string(),
+    status: z.enum(["Promoted", "Repeated", "Completed"]),
+    promotedAt: z.string().optional()
+  })).optional()
+});
+
+// Protected: Create a new student
+router.post("/", authenticateJWT, async (req: Request, res: Response) => {
   try {
-    const classDoc = new Class(req.body);
-    await classDoc.save();
-    res.status(201).json(classDoc);
+    const parsed = studentSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.issues });
+    }
+    const student = new Student(parsed.data);
+    await student.save();
+    res.status(201).json(student);
   } catch (err) {
-    res.status(400).json({ error: err instanceof Error ? err.message : "An unknown error occurred" });
+    if (err instanceof Error) {
+      res.status(400).json({ error: (err as Error).message });
+    } else {
+      res.status(400).json({ error: "An unknown error occurred" });
+    }
   }
 });
 
-// Protected: Get all classes
-router.get("/", authenticateJWT, async (req, res) => {
+// Protected: Get all students
+router.get("/", authenticateJWT, async (req: Request, res: Response) => {
   try {
-    const classes = await Class.find();
-    res.json(classes);
+    const students = await Student.find();
+    res.json(students);
   } catch (err) {
-    res.status(400).json({ error: err instanceof Error ? err.message : "An unknown error occurred" });
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(400).json({ error: "An unknown error occurred" });
+    }
   }
 });
 

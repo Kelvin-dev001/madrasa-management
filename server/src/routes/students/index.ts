@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import { Student } from "../../models/Student.js";
 import { z } from "zod";
 import { authenticateJWT } from "../../middleware/auth.js";
@@ -29,7 +29,7 @@ const studentSchema = z.object({
 });
 
 // Protected: Create a new student
-router.post("/", authenticateJWT, async (req, res) => {
+router.post("/", authenticateJWT, async (req: Request, res: Response) => {
   try {
     const parsed = studentSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -40,7 +40,7 @@ router.post("/", authenticateJWT, async (req, res) => {
     res.status(201).json(student);
   } catch (err) {
     if (err instanceof Error) {
-      res.status(400).json({ error: (err as Error).message });
+      res.status(400).json({ error: err.message });
     } else {
       res.status(400).json({ error: "An unknown error occurred" });
     }
@@ -48,7 +48,7 @@ router.post("/", authenticateJWT, async (req, res) => {
 });
 
 // Protected: Get all students
-router.get("/", authenticateJWT, async (req, res) => {
+router.get("/", authenticateJWT, async (req: Request, res: Response) => {
   try {
     const students = await Student.find();
     res.json(students);

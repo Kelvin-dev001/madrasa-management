@@ -1,4 +1,5 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
+import type { Request, Response } from "express";
 import { Teacher } from "../../models/Teacher.js";
 import { authenticateJWT } from "../../middleware/auth.js";
 

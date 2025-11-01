@@ -1,0 +1,11 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+  }
+  header {
+    background-color: #f0f0f0;
+    padding: 1em;
+  }
+  main {
+    padding: 2em;
+  }
